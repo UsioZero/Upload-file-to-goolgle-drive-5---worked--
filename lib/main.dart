@@ -1,6 +1,9 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gdt5/GoogleAuthClient.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:google_sign_in/google_sign_in.dart' as signIn;
+import 'package:path/path.dart' as path;
 
 void main() {
   runApp(MyApp());
@@ -37,6 +40,25 @@ class _MyHomePageState extends State<MyHomePage> {
         signIn.GoogleSignIn.standard(scopes: [drive.DriveApi.DriveScope]);
     final signIn.GoogleSignInAccount account = await googleSignIn.signIn();
     print("User account $account");
+
+    final authHeaders = await account.authHeaders;
+    final authenticateClient = GoogleAuthClient(authHeaders);
+    final driveApi = drive.DriveApi(authenticateClient);
+
+    var filepick = await FilePicker.platform.pickFiles();
+    var driveFile = new drive.File();
+    driveFile.name = filepick.names.first;
+    driveFile.parents = ["appDataFolder"];
+    var df2 = new drive.File();
+    df2.name = 'df2.txt';
+
+    final Stream<List<int>> mediaStream =
+        Future.value(filepick.files.first.bytes.toList())
+            .asStream()
+            .asBroadcastStream();
+    var media = new drive.Media(mediaStream, filepick.files.first.size);
+    final result = await driveApi.files.create(driveFile, uploadMedia: media);
+    print("Upload result: $result");
   }
 
   @override
