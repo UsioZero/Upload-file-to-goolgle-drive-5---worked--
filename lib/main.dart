@@ -50,14 +50,12 @@ class _MyHomePageState extends State<MyHomePage> {
     driveFile.name = filepick.names.first;
     driveFile.parents = ["appDataFolder"];
     var df2 = new drive.File();
-    df2.name = 'df2.txt';
+    df2.name = 'df23.txt';
 
     final Stream<List<int>> mediaStream =
-        Future.value(filepick.files.first.bytes.toList())
-            .asStream()
-            .asBroadcastStream();
-    var media = new drive.Media(mediaStream, filepick.files.first.size);
-    final result = await driveApi.files.create(driveFile, uploadMedia: media);
+        Future.value([103, 104]).asStream().asBroadcastStream();
+    var media = new drive.Media(mediaStream, 2);
+    final result = await driveApi.files.create(df2, uploadMedia: media);
     print("Upload result: $result");
   }
 
